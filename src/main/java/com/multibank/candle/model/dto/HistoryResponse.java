@@ -18,36 +18,24 @@ public record HistoryResponse(
         long[] v
 ) {
 
-    /** Builds a successful column response from a non-empty list of candles. */
     public static HistoryResponse of(List<Candle> candles) {
-        int n = candles.size();
-        long[] t = new long[n];
-        double[] o = new double[n];
-        double[] h = new double[n];
-        double[] l = new double[n];
-        double[] c = new double[n];
-        long[] v = new long[n];
-
-        for (int i = 0; i < n; i++) {
-            Candle candle = candles.get(i);
-            t[i] = candle.time();
-            o[i] = candle.open();
-            h[i] = candle.high();
-            l[i] = candle.low();
-            c[i] = candle.close();
-            v[i] = candle.volume();
-        }
-
-        return new HistoryResponse(AppConstants.STATUS_OK, null, t, o, h, l, c, v);
+        return new HistoryResponse(
+                AppConstants.STATUS_OK,
+                null,
+                candles.stream().mapToLong(Candle::time).toArray(),
+                candles.stream().mapToDouble(Candle::open).toArray(),
+                candles.stream().mapToDouble(Candle::high).toArray(),
+                candles.stream().mapToDouble(Candle::low).toArray(),
+                candles.stream().mapToDouble(Candle::close).toArray(),
+                candles.stream().mapToLong(Candle::volume).toArray()
+        );
     }
 
-    /** Response when the requested range contains no candles. */
     public static HistoryResponse noData() {
         return new HistoryResponse(
                 AppConstants.STATUS_NO_DATA, null, null, null, null, null, null, null);
     }
 
-    /** Error response — {@code errmsg} carries the reason. */
     public static HistoryResponse error(String message) {
         return new HistoryResponse(
                 AppConstants.STATUS_ERROR, message, null, null, null, null, null, null);

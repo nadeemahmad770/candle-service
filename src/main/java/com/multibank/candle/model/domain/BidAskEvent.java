@@ -17,10 +17,10 @@ public record BidAskEvent(
     }
 
     public BidAskEvent {
-        if (symbol    == null || symbol.isBlank()) throw new IllegalArgumentException("symbol must not be blank");
-        if (bid       <= 0)                        throw new IllegalArgumentException("bid must be positive");
-        if (ask       <= 0)                        throw new IllegalArgumentException("ask must be positive");
-        if (ask       <  bid)                      throw new IllegalArgumentException("ask must be >= bid");
-        if (timestamp <= 0)                        throw new IllegalArgumentException("timestamp must be positive");
+        if (symbol == null || symbol.isBlank()) throw new IllegalArgumentException("symbol must not be blank");
+        if (bid <= 0) throw new IllegalArgumentException("bid must be positive");
+        if (ask <= 0) throw new IllegalArgumentException("ask must be positive");
+        if (ask < bid) throw new IllegalArgumentException("ask must be >= bid");
+        if (timestamp <= 0) throw new IllegalArgumentException("timestamp must be positive");
     }
 }

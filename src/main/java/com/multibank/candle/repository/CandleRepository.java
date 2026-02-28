@@ -14,7 +14,7 @@ public interface CandleRepository extends JpaRepository<CandleEntity, Long> {
 
     /**
      * Fetches all candles for a symbol/interval within the inclusive time range
-     * [{@code from}, {@code to}], ordered chronologically.
+     * [{@code from}, {@code to}], ordered by openTime.
      */
     @Query("""
            SELECT c FROM CandleEntity c

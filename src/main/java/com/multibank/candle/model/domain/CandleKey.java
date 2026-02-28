@@ -2,7 +2,6 @@ package com.multibank.candle.model.domain;
 
 import com.multibank.candle.enums.Interval;
 
-
 public record CandleKey(
         String symbol,
         Interval interval,

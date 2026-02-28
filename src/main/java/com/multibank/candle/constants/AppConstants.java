@@ -15,7 +15,6 @@ public final class AppConstants {
     public static final String STATUS_OK      = "ok";
     public static final String STATUS_NO_DATA = "no_data";
     public static final String STATUS_ERROR   = "error";
-    public static final int DB_SEQ_ALLOCATION_SIZE = 50;
     public static final int DB_SYMBOL_MAX_LENGTH = 20;
     public static final int DB_INTERVAL_CODE_MAX_LENGTH = 5;
 }
