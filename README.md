@@ -49,16 +49,14 @@ curl http://localhost:8080/api/v1/status
 
 ## Assumptions and Trade-offs
 
-## Assumptions and Trade-offs
-
 ### Assumptions
 
-**Data Source**: For this implementation, I used a simulated data generator that creates realistic bid/ask events. The generator uses a random walk model with ±0.1% price movements and 0.01% spreads, which is adequate for demonstrating the aggregation logic. In production, this would be replaced with actual Kafka consumers or WebSocket feeds.
-**Storage**: H2 in-memory database is used by default. This works well for development and testing, but production deployments should use PostgreSQL or TimescaleDB for proper persistence and time-series optimizations.
-**Symbol Format**: The system expects trading pairs in "BASE-QUOTE" format (e.g., BTC-USD, ETH-USDT). No specific validation is enforced beyond non-empty string checks.
-**Volume Calculation**: Since the simulated data doesn't include actual trade quantities, volume is calculated as the number of ticks (bid/ask events) per candle. Real implementations would need actual volume data from trade executions.
-**Time Window Handling**: All timestamps use UNIX seconds. The system includes a 5-second grace period before flushing closed windows to handle slightly delayed events. This seems reasonable for most market data scenarios, though high-frequency trading might need adjustment.
-**Concurrency Model**: The aggregation service uses ConcurrentHashMap and synchronized methods. This approach was chosen because multiple threads need to read/write candle windows simultaneously, and the performance overhead is acceptable given the relatively low write contention.
+- **Data Source**: For this implementation, I used a simulated data generator that creates realistic bid/ask events. The generator uses a random walk model with ±0.1% price movements and 0.01% spreads, which is adequate for demonstrating the aggregation logic. In production, this would be replaced with actual Kafka consumers or WebSocket feeds.
+- **Storage**: H2 in-memory database is used by default. This works well for development and testing, but production deployments should use PostgreSQL or TimescaleDB for proper persistence and time-series optimizations.
+- **Symbol Format**: The system expects trading pairs in "BASE-QUOTE" format (e.g., BTC-USD, ETH-USDT). No specific validation is enforced beyond non-empty string checks.
+- **Volume Calculation**: Since the simulated data doesn't include actual trade quantities, volume is calculated as the number of ticks (bid/ask events) per candle. Real implementations would need actual volume data from trade executions.
+- **Time Window Handling**: All timestamps use UNIX seconds. The system includes a 5-second grace period before flushing closed windows to handle slightly delayed events. This seems reasonable for most market data scenarios, though high-frequency trading might need adjustment.
+- **Concurrency Model**: The aggregation service uses ConcurrentHashMap and synchronized methods. This approach was chosen because multiple threads need to read/write candle windows simultaneously, and the performance overhead is acceptable given the relatively low write contention.
 
 ### Trade-offs
 
