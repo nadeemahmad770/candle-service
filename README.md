@@ -4,15 +4,15 @@ A high-performance backend Java service that listens to a continuous stream of b
 
 ## Features
 
-- **Real-time Stream Ingestion** - Processes bid/ask market data events continuously
-- **Multi-Symbol & Multi-Timeframe** - Supports multiple trading pairs and intervals (1s, 5s, 1m, 15m, 1h)
-- **OHLC Candlestick Aggregation** - Aggregates ticks into Open/High/Low/Close candles with volume
-- **Persistent Storage** - Stores candle data with H2
-- **History API** - REST endpoint compatible with TradingView specification
-- **Thread-Safe & Concurrent** - Handles high-frequency updates without blocking
-- **Graceful Shutdown** - Flushes all pending candles on application shutdown
-- **Observability** - Micrometer metrics, health checks, and structured logging
-- **Comprehensive Tests** - Unit and integration tests with 90%+ coverage
+- Real-time stream ingestion of bid/ask market data events
+- Multi-symbol and multi-timeframe support (1s, 5s, 1m, 15m, 1h intervals)
+- OHLC candlestick aggregation with volume tracking
+- Persistent storage using H2 database (in-memory by default)
+- REST API compatible with TradingView data feed specification
+- Thread-safe concurrent processing of high-frequency updates
+- Graceful shutdown with automatic flush of pending candles
+- Built-in observability with Micrometer metrics and health checks
+- Comprehensive test coverage (90%+)
 
 -----------
 
@@ -257,7 +257,7 @@ mvn test
 
 The project includes:
 - **Unit Tests** - Domain logic (BidAskEvent, CandleBuilder, Interval)
-- **Integration Tests** - Full end-to-end flow (ingest → aggregate → store → query)
+- **Integration Tests** - Full end-to-end flow (ingest - aggregate - store - query)
 - **API Tests** - REST endpoint validation and error handling
 
 Key test files:
