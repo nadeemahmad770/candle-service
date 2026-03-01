@@ -46,6 +46,54 @@ curl http://localhost:8080/api/v1/status
 
 ---
 
+
+## Assumptions and Trade-offs
+
+## Assumptions and Trade-offs
+
+### Assumptions
+
+**Data Source**: For this implementation, I used a simulated data generator that creates realistic bid/ask events. The generator uses a random walk model with ±0.1% price movements and 0.01% spreads, which is adequate for demonstrating the aggregation logic. In production, this would be replaced with actual Kafka consumers or WebSocket feeds.
+**Storage**: H2 in-memory database is used by default. This works well for development and testing, but production deployments should use PostgreSQL or TimescaleDB for proper persistence and time-series optimizations.
+**Symbol Format**: The system expects trading pairs in "BASE-QUOTE" format (e.g., BTC-USD, ETH-USDT). No specific validation is enforced beyond non-empty string checks.
+**Volume Calculation**: Since the simulated data doesn't include actual trade quantities, volume is calculated as the number of ticks (bid/ask events) per candle. Real implementations would need actual volume data from trade executions.
+**Time Window Handling**: All timestamps use UNIX seconds. The system includes a 5-second grace period before flushing closed windows to handle slightly delayed events. This seems reasonable for most market data scenarios, though high-frequency trading might need adjustment.
+**Concurrency Model**: The aggregation service uses ConcurrentHashMap and synchronized methods. This approach was chosen because multiple threads need to read/write candle windows simultaneously, and the performance overhead is acceptable given the relatively low write contention.
+
+### Trade-offs
+
+**Stream API vs Traditional Loops**
+
+Uses Java Streams instead of traditional for-loops. This means creating 6 separate stream iterations (one per OHLC field) instead of a single loop. The code is much cleaner and more maintainable, but technically does more work.
+The performance difference is negligible for typical datasets (under 10,000 candles), and in practice, I'd rather have readable code than micro-optimizations unless profiling shows otherwise. For extremely large datasets, the single-loop version could be restored if needed.
+
+**In-Memory Window Storage**
+
+Open candle windows are kept in memory rather than being immediately persisted to the database. This means faster tick-by-tick updates (under 1ms per tick) at the cost of some memory usage. Each window is only about ~100 bytes, so even with thousands of symbol-interval combinations, the memory footprint stays small.
+The alternative would be hitting the database on every tick, which would be significantly slower and create unnecessary load. The in-memory approach makes sense here.
+
+**Grace Period Design**
+
+There's a configurable grace period (5 seconds default) before flushing completed candles. This delays data availability slightly but ensures we don't miss late-arriving events.
+Could have made this 0 seconds for instant availability, but market data feeds sometimes have slight delays or out-of-order delivery. It can be adjusted based on specific data source characteristics.
+
+**Built-in Data Simulator**
+
+Rather than requiring external services for testing, included a data simulator that runs by default. This makes the service immediately runnable without any dependencies, which is great for development and demonstrations.
+The downside is having test code in the production codebase, but it's cleanly separated in its own service class and can be easily disabled or removed. The convenience of "just run it" outweighed the slight code overhead.
+
+**H2 vs Production Database**
+
+The default configuration uses H2 in-memory for zero setup friction. You can literally clone and run without installing anything.
+Obviously, this loses all data on restart and lacks time-series optimizations. But for the purpose of this exercise, getting something running quickly was more important than production-grade persistence. Switching to PostgreSQL/TimescaleDB is straightforward and documented.
+
+**Fail-Fast Validation**
+
+Input validation happens eagerly in record constructors and at method entry points. Invalid data throws exceptions immediately rather than being stored and causing issues later.
+This adds a small overhead to object creation, but catching errors early is almost always worth it. The alternative discovering bad data deep in the processing pipeline is much worse.
+
+-------------
+
 ## API Documentation
 
 ### History Endpoint
